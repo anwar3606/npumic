@@ -11,6 +11,7 @@ How npumic ended up running DPDFNet-2 and VoxLock on the Intel NPU: the models I
 5. **The NPU runs one job at a time,** so two models on it must take turns. → [Sharing the NPU](#5-two-models-one-npu)
 6. **The GPU worked, but cost about 30 W.** So npumic is NPU-only. → [Why not the GPU](#6-why-not-the-gpu)
 7. **Listening tests beat scores.** An automatic quality score preferred a broken chain over raw audio. → [How changes were judged](#8-how-changes-were-judged)
+8. **The best existing tool, NVIDIA Broadcast, doesn't work here.** It's Windows only, and its Linux SDK is for licensed datacenter GPUs. → [Considered but not used](#10-considered-but-not-used)
 
 ## Test setup
 
@@ -181,6 +182,38 @@ The listening tests made several decisions: UL-UNAS was dropped, GTCRN was the d
 | CAM++ | The NPU compiler fails on an unsupported pooling padding mode. |
 | TF-GridNet and SepFormer | They separate speakers well, but need 2–8 s of audio at once: 1.3 s per run on the CPU, and the NPU compiler runs out of memory. |
 | Hush on the NPU | It waited behind DPDFNet's calls: 394 late cycles in 6 s. |
+
+## 10. Considered but not used
+
+These never ran in npumic. I looked into each one and stopped before testing. Status is as of October 2026.
+
+### NVIDIA
+
+The obvious answer to "clean up my mic with AI" is NVIDIA Broadcast. It works well, but not on Linux.
+
+| Option | What it is | Why not |
+| --- | --- | --- |
+| [NVIDIA Broadcast](https://www.nvidia.com/en-us/geforce/broadcasting/broadcast-app/) | NVIDIA's free noise removal app for RTX cards | Windows only. |
+| [NVIDIA Audio Effects SDK](https://docs.nvidia.com/maxine/afx/latest/LinuxAFXSDK/GetStartedOnLinux.html) (Maxine) | The models behind Broadcast, for developers: noise removal, room echo removal, Studio Voice, and Speaker Focus (keeps only the main speaker) | The Windows SDK targets desktop apps, but the Linux SDK is built for datacenter and cloud servers, and NVIDIA doesn't support it anywhere else. The download sits behind an NGC subscription, and [NVIDIA staff said](https://forums.developer.nvidia.com/t/impossible-to-download-maxine-audio-effects-sdk/343193) an NVIDIA AI Enterprise license is required (downloads return "402 Payment Required"). Even with access, it would keep the GPU awake during every call. |
+
+### Voice isolation models
+
+Before VoxLock, I looked for an open, live "keep only my voice" model:
+
+| Option | What it is | Why not |
+| --- | --- | --- |
+| [REAL-TSE](https://real-tse.github.io/challenge) online models | Streaming voice isolation from a 2026 research challenge, trained on real meeting and dinner-party recordings | The models were only available to registered challenge teams. Converted baselines have appeared since, but without a clear license. |
+| [OpenSpeakerBeam-SS](https://github.com/helloooideeeeea/OpenSpeakerBeam-SS) | An independent reimplementation of SpeakerBeam-SS, a real-time voice isolation model | Its author describes the quality as "modest". |
+| [D-LGTSE](https://github.com/isHuangZiling/D-LGTSE) | Voice isolation guided by GTCRN noise removal | Processes whole recordings, not live audio. |
+
+### Other noise removal
+
+| Option | What it is | Why not |
+| --- | --- | --- |
+| Windows Studio Effects "Voice Focus", Krisp | NPU and CPU noise removal products | Closed products, not downloadable models. Windows Studio Effects is Windows only. |
+| [Intel PoCoNet](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/intel/noise-suppression-poconetlike-0001) (Model Zoo) | Intel's other ready-made noise removal model | 16 kHz only, the same limit as GTCRN. Its sibling DenseUNet already failed on the NPU. |
+| [Intel DeepFilterNet for OpenVINO](https://huggingface.co/Intel/deepfilternet-openvino) | Intel's conversion of DeepFilterNet 2 and 3 | Fixed to 30 s inputs, so offline only (see [Dead ends](#9-dead-ends)). |
+| Retraining DPDFNet to cope with FP16, on the RTX 5060 | Fine-tune the existing weights with FP16 rounding simulated during training | Ceva published the model but [not how it was trained for low precision](https://github.com/ceva-ip/DPDFNet/issues/18). It would need hundreds of GB of training data and days of work, with no guarantee the GPU's FP16 matches the NPU's. Moving the input features to the CPU ([section 2](#2-the-npu-only-computes-in-fp16)) fixed the problem without any retraining. |
 
 ---
 
