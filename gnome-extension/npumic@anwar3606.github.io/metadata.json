@@ -1,0 +1,8 @@
+{
+    "uuid": "npumic@anwar3606.github.io",
+    "name": "NPU Denoised Mic",
+    "description": "Quick settings toggle for the NPU Denoised Mic service: turn it on and off, remove other voices, record a voice sample, and see what is wrong when it fails.",
+    "shell-version": ["46", "47", "48", "49", "50", "51", "52"],
+    "url": "https://github.com/anwar3606/npumic",
+    "version-name": "1.0"
+}

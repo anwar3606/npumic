@@ -1,0 +1,30 @@
+[project]
+name = "npumic"
+version = "0.1.0"
+description = "Real-time microphone noise removal and voice isolation on the Intel NPU, exposed as a virtual microphone"
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Anwar Hossain", email = "anwar3606@gmail.com" }]
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.0",
+    "scipy>=1.14",
+    "soundfile>=0.12",
+    "openvino>=2026.0",
+    "jack-client>=0.5.7",
+]
+
+[project.scripts]
+npumic = "npumic.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
+[build-system]
+requires = ["uv_build>=0.12.23,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-m 'not live'"
+markers = ["live: end-to-end tests through PipeWire (run with: pytest -m live)"]

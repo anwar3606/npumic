@@ -1,0 +1,19 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Large binary assets (models, NPU driver, compiled blobs)
+models/
+driver/
+
+# Personal recordings and generated audio
+data/
+local/
+vendor/
