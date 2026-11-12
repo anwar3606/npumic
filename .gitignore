@@ -9,11 +9,8 @@ wheels/
 # Virtual environments
 .venv
 
-# Large binary assets (models, NPU driver, compiled blobs)
+# Downloaded models and compiled-model cache
 models/
-driver/
 
-# Personal recordings and generated audio
+# Settings and voice samples
 data/
-local/
-vendor/

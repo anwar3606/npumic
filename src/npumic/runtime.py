@@ -1,4 +1,4 @@
-"""OpenVINO setup: user-space NPU driver discovery and the compiled-model cache.
+"""OpenVINO setup, model downloads and the compiled-model cache.
 
 Import this module before `openvino` anywhere in the package.
 """
@@ -60,9 +60,6 @@ def ensure_models() -> None:
     for rel_path in MODELS:
         ensure_model(rel_path)
 
-_BUNDLED_NPU_DRIVER = ROOT / "driver/extracted/usr/lib/x86_64-linux-gnu/libze_intel_npu.so.1"
-_SYSTEM_NPU_DRIVER = Path("/usr/lib/x86_64-linux-gnu/libze_intel_npu.so.1")
-
 # hwloc prints a large warning about this CPU's topology on every start; it is harmless.
 os.environ.setdefault("HWLOC_HIDE_ERRORS", "2")
 
@@ -70,10 +67,6 @@ os.environ.setdefault("HWLOC_HIDE_ERRORS", "2")
 # sender process; forking a multi-threaded real-time audio process can deadlock it.
 # With the module unavailable, OpenVINO falls back to its built-in no-op stub.
 sys.modules["openvino_telemetry"] = None
-
-# The Level Zero loader reads this at first use, so it works without LD_LIBRARY_PATH.
-if not _SYSTEM_NPU_DRIVER.exists() and _BUNDLED_NPU_DRIVER.exists():
-    os.environ.setdefault("ZE_ENABLE_ALT_DRIVERS", str(_BUNDLED_NPU_DRIVER))
 
 import numpy as np  # noqa: E402
 import openvino as ov  # noqa: E402

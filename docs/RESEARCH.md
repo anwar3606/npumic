@@ -185,7 +185,7 @@ The listening tests made several decisions: UL-UNAS was dropped, GTCRN was the d
 
 ## 10. Considered but not used
 
-These never ran in npumic. I looked into each one and stopped before testing. Status is as of October 2026.
+These never ran in npumic. I looked into each one and stopped before testing. Status is as of November 2026.
 
 ### NVIDIA
 

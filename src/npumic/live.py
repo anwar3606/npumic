@@ -15,8 +15,8 @@ While inactive, the physical microphone is not linked and the callback outputs
 silence without processing; the service activates the engine only while an
 app records from the virtual microphone (see `consumers`).
 
-PipeWire's libjack is vendored (vendor/pipewire-jack, extracted from the
-official Ubuntu package without root) and loaded before the `jack` module.
+PipeWire's libjack (from the system's pipewire-jack package) is loaded before
+the `jack` module.
 """
 
 import ctypes
@@ -34,7 +34,6 @@ from npumic.devices import VIRTUAL_MIC_PREFIX, Mic, Output, default_output
 from npumic.engine import BLOCK, SAMPLE_RATE, Reblocker, Stage
 from npumic.micvolume import CLIP_LEVEL
 from npumic.monitor import Ring, Spectrograms
-from npumic.runtime import ROOT
 
 VIRTUAL_NAME = VIRTUAL_MIC_PREFIX
 VIRTUAL_DESCRIPTION = "NPU Denoised Mic"
@@ -45,7 +44,6 @@ _PIPEWIRE_LIBJACK_PATHS = (
     "/usr/lib/x86_64-linux-gnu/pipewire-0.3/jack/libjack.so.0",
     "/usr/lib64/pipewire-0.3/jack/libjack.so.0",
     "/usr/lib/pipewire-0.3/jack/libjack.so.0",
-    str(ROOT / "vendor/pipewire-jack/extracted/usr/lib/x86_64-linux-gnu/pipewire-0.3/jack/libjack.so.0"),
 )
 
 
